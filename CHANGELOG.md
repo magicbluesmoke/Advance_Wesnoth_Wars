@@ -4,6 +4,15 @@ For more clarity about compatibility, first 2 version numbers will follow base g
 
 So 1.14.X.Y means game was checked compatible with Wesnoth 1.14. X is incremented for new features ; Y is increment for fixes/optimisations.
 
+## [fork] - 2026-08-28
+
+### Added
+- Feature #20 : Role XP for warriors — bonus XP per point of damage dealt (default 0 = native baseline).
+- Features #16-19 : Role XP channels for scout / tank / leader / buffer.
+
+### Changed
+- Role-XP defaults calibrated for warrior-native parity (shortfall philosophy): scout 8, tank 4, leader 8, buffer 10; slider max raised 6 -> 12. Warrior channel 0 (native XP is the reference baseline). See `docs/plans/2026-08-28-role-xp-calibration.md`.
+
 ## [1.14.15.1] - 2019-10-19
 
 ### Added
