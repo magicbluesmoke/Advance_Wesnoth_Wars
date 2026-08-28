@@ -3,8 +3,9 @@
 # Usage: bash tools/deploy.sh
 # The game loads add-ons from the Wesnoth userdata add-ons dir (OneDrive-redirected
 # here). C:/src/Advance_Wesnoth_Wars is the source of truth / git repo; this script
-# copies the project files there so the game sees the current state, then verifies
-# with a full tree diff and exits non-zero if anything differs.
+# MIRRORS the project files there (copies new/changed, deletes destination orphans)
+# so the game sees the current state, then verifies with a full tree diff and exits
+# non-zero if anything differs.
 #
 # Uses only git-bash built-ins (no rsync dependency).
 set -euo pipefail
@@ -19,22 +20,34 @@ fi
 
 echo "Deploying $REPO -> $DEP"
 
-# Copy all project files (tracked + untracked), excluding VCS/backup artifacts.
-# First clear the destination of previous stray artifacts, then copy over.
-find "$DEP" -type f \
-  \( -name '*.bak' -o -name '_server.ign' -o -name '.git' \) -delete 2>/dev/null || true
+EXCLUDED=".git _server.ign *.bak"
 
-# Copy every file under the repo (respecting exclusions) into the deployed tree.
+# Pass 1: copy every project file from the repo into the deployed tree.
 cd "$REPO"
 find . -type f \
   ! -path './.git/*' \
-  ! -name '*.bak' \
-  ! -name '_server.ign' \
   ! -name '.git' \
+  ! -name '_server.ign' \
+  ! -name '*.bak' \
   -print0 | while IFS= read -r -d '' f; do
     rel="${f#./}"
     mkdir -p "$DEP/$(dirname "$rel")"
     cp -f "$f" "$DEP/$rel"
+  done
+
+# Pass 2: delete destination files that are NOT in the repo (mirror semantics),
+# skipping the same exclusions so we never remove files the repo intentionally
+# does not track.
+cd "$DEP"
+find . -type f \
+  ! -name '.git' \
+  ! -name '_server.ign' \
+  ! -name '*.bak' \
+  -print0 | while IFS= read -r -d '' f; do
+    rel="${f#./}"
+    if [ ! -e "$REPO/$rel" ]; then
+      rm -f "$f"
+    fi
   done
 
 echo "Verifying parity..."
