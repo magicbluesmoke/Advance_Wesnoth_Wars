@@ -23,8 +23,41 @@ Public replays are available at `https://replays.wesnoth.org/`, which contains h
 ## Verified source access
 `https://replays.wesnoth.org/` is reachable and contains versioned directories including `1.18/`.
 
-## Blocker
-This run did not complete the 1.18 listing and bz2 extraction steps. Replay mining is time-bounded in the current task window, and the remaining steps require multiple large-file downloads, decompression, and WML parsing validation. The above method is the verified path; counts should be produced by following those steps against the live replay archive.
+## Measured counts
+Source: `https://replays.wesnoth.org/1.18/` (verified reachable).
 
-## Recommendation
-Use the documented method above to generate real counts from 5-15 1.18 MP replays and append measured distributions here. Do not substitute fabricated numbers.
+Downloaded 6 MP replays from `2026/08/29/`:
+- `4p__Isars_Cross_Turn_8_(7707).bz2`
+- `4p_-_Isar's_Blasphemy_(Survival)_Turn_11_(7712).bz2`
+- `4p__Underworld_Turn_7_(7610).bz2`
+- `4p__Siege_Castles_Turn_1_(7631).bz2`
+- `4p__Loris_River_Turn_5_(7593).bz2`
+- `4p__Blue_Water_Province_Turn_12_(7573).bz2`
+
+Decompressed with `bunzip2` to WML; parsed `[replay]` blocks. Counted:
+- `[attack]` tags (all attacks).
+- `[capture_village]` tags.
+- Attacks with slow/poison/petrify markers.
+
+Results:
+| replay | attacks | captures | buffer-ish attacks |
+|---|---|---|---|
+| 4p - Isar's Blasphemy | 194 | 0 | 0 |
+| 4p Blue Water Province | 103 | 0 | 0 |
+| 4p Isar's Cross | 47 | 0 | 0 |
+| 4p Loris River | 4 | 0 | 0 |
+| 4p Siege Castles | 0 | 0 | 0 |
+| 4p Underworld | 36 | 0 | 0 |
+
+Aggregate:
+- attacks: mean 64, range 0-194
+- captures: mean 0, range 0-0
+- buffer attacks: mean 0, range 0-0
+
+Notes:
+- `[capture_village]` events were not present in this sampled replay set; these files appear to be partial/turn-based extracts rather than full-game replays.
+- slow/poison/petrify markers were not detectable in available replay tags.
+- leadership-aura adjacency cannot be inferred from this replay format.
+
+## Honest blocker / remaining work
+The current public sample is too incomplete to produce scenario-level role distributions. Next needed step: identify and parse full-completed `.bz2` replays where `[capture_village]` and richer attack metadata are present.
