@@ -20,10 +20,10 @@ DEFAULT_SURVIVE_XP = 1
 DEFAULT_THRESHOLD_L1_L2 = 50
 DEFAULT_THRESHOLD_L2_L3 = 90
 DEFAULT_ROLE_XP: Dict[str, int] = {
-    "scout": 8,
-    "tank": 4,
-    "leader": 8,
-    "buffer": 10,
+    "scout": 3,
+    "tank": 2,
+    "leader": 3,
+    "buffer": 4,
     "warrior": 0,
 }
 DEFAULT_ACTION_COUNTS: Dict[str, float] = {

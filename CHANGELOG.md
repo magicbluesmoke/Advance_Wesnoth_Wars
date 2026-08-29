@@ -4,6 +4,11 @@ For more clarity about compatibility, first 2 version numbers will follow base g
 
 So 1.14.X.Y means game was checked compatible with Wesnoth 1.14. X is incremented for new features ; Y is increment for fixes/optimisations.
 
+## [fork] - 2026-08-29
+
+### Changed
+- Role-XP defaults re-calibrated by Monte Carlo simulation (mid-fight parity): scout 8 -> 3, tank 4 -> 2, leader 8 -> 3, buffer 10 -> 4. The previous shortfall-parity values overleveled fighting roles (a role unit that also fights 5 combats stacked ~20 XP/scenario on top of warrior-native combat XP, roughly doubling the leveling rate). New values put a role unit doing its role + occasional fighting (~3 combats) at warrior L3 parity within ~0.6 scenarios. Sim evidence: `tools/xp_parity_sim.py`, `tools/xp_sensitivity_sweep.py`, `tools/xp_calibrate_defaults.py`. Playtest (human sessions) remains the ground-truth validation.
+
 ## [fork] - 2026-08-28
 
 ### Added
