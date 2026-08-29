@@ -13,7 +13,7 @@ from typing import Dict, List, Tuple
 
 DEFAULT_TRIALS = 10_000
 DEFAULT_SCENARIO_COMBATS = 5
-DEFAULT_SCENARIO_KILLS = 2
+DEFAULT_SCENARIO_KILL_PROB = 0.45
 DEFAULT_ENEMY_LEVEL = 1
 DEFAULT_KILL_XP = 8
 DEFAULT_SURVIVE_XP = 1
@@ -81,14 +81,14 @@ def xp_per_scenario(
     combat_xp = kills * (enemy_level * DEFAULT_KILL_XP) + max(0, combats - kills) * (enemy_level * DEFAULT_SURVIVE_XP)
     if warrior_mode:
         return float(combat_xp)
-    sampled_actions = max(0.0, rng.gauss(action_count, math.sqrt(max(action_count, 0.5))))
-    return float(combat_xp + role_xp_per_action * sampled_actions)
+    # Deterministic action XP; Monte Carlo variance comes from combat/kills.
+    return float(combat_xp + role_xp_per_action * action_count)
 
 
 def run_trials(
     role: str,
     combats: int,
-    kills: int,
+    kill_prob: float,
     enemy_level: int,
     role_xp_per_action: int,
     action_count: float,
@@ -107,6 +107,7 @@ def run_trials(
         scenarios_to_l2 = 0
         scenarios_to_l3 = 0
         while not reached_l3 and scenarios < 2000:
+            kills = sum(1 for _ in range(combats) if rng.random() < kill_prob)
             xp += xp_per_scenario(
                 role=role,
                 combats=combats,
@@ -167,7 +168,7 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="AWW role XP parity Monte Carlo simulator")
     p.add_argument("--trials", type=int, default=DEFAULT_TRIALS)
     p.add_argument("--combats", type=int, default=DEFAULT_SCENARIO_COMBATS)
-    p.add_argument("--kills", type=int, default=DEFAULT_SCENARIO_KILLS)
+    p.add_argument("--kills", type=float, default=DEFAULT_SCENARIO_KILL_PROB)
     p.add_argument("--enemy-level", type=int, default=DEFAULT_ENEMY_LEVEL)
     p.add_argument("--role-xp", type=str, default=None, help="JSON object role->xp")
     p.add_argument("--action-counts", type=str, default=None, help="JSON object role->actions per scenario")
@@ -199,7 +200,7 @@ def run_spectrum(
         res = run_trials(
             role=role,
             combats=effective_combats,
-            kills=0,
+            kill_prob=kill_prob,
             enemy_level=enemy_level,
             role_xp_per_action=role_xp_per_action,
             action_count=base_action,
@@ -291,7 +292,7 @@ def main() -> int:
     warrior_results = run_trials(
         role="warrior",
         combats=args.combats,
-        kills=0,
+        kill_prob=args.kills,
         enemy_level=args.enemy_level,
         role_xp_per_action=0,
         action_count=0,
@@ -312,6 +313,7 @@ def main() -> int:
             combats=args.combats,
             kill_prob=args.kills,
             enemy_level=args.enemy_level,
+            role_xp_per_action=role_xp.get(role, 0),
             threshold_l1_l2=args.threshold_l1_l2,
             threshold_l2_l3=args.threshold_l2_l3,
             rng=rng,
