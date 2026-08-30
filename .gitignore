@@ -16,3 +16,4 @@ meta.xml
 *.bk
 
 tools/replay_scratch/
+__pycache__/

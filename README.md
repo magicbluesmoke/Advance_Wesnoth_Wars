@@ -13,6 +13,11 @@ It's a mod  for "Battle for Wesnoth" open-source videogame.
 * Code Repository [on GitHub](https://github.com/tbondois/Advance_Wesnoth_Wars)
 * Dedicated [forum thread](https://forums.wesnoth.org/viewtopic.php?f=15&t=49454)
 
+Repo hygiene note: scratch/research directories (`tools/replay_scratch/`, `__pycache__/`)
+are gitignored and must NOT be committed. Kanban workers auto-commit their workspace; keep
+transient artifacts (downloaded replays, HTML, parsed scratch) out of tracked commits. Real
+mod content and reusable analysis tools live in `mods/`, `tools/*.py`, `docs/`.
+
 
 DISCLAIMER FOR MODDERS
 ----------------------
